@@ -19,6 +19,7 @@ C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\communit
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\mapper\ActivityMapper.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\config\PasswordConfig.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\entity\Reward.java
+C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\util\LogUtil.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\entity\ActivityRecord.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\entity\TrainingRecord.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\controller\AdminController.java
@@ -26,6 +27,7 @@ C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\communit
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\entity\Certificate.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\enums\UserType.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\controller\UserController.java
+C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\annotation\OperationLog.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\entity\Activity.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\mapper\RequestMapper.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\entity\User.java

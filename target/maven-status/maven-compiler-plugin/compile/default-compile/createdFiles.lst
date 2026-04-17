@@ -13,9 +13,11 @@ com\community\CommunityVolunteerApplication.class
 com\community\config\AIConfig.class
 com\community\entity\SOSEmergency.class
 com\community\entity\Reward.class
+com\community\annotation\OperationLog.class
 com\community\entity\Training.class
 com\community\entity\Evaluation.class
 com\community\controller\UserController.class
+com\community\util\LogUtil.class
 com\community\enums\RequestStatus.class
 com\community\service\AIService.class
 com\community\mapper\PointsRecordMapper.class
