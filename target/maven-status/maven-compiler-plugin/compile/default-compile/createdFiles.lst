@@ -1,4 +1,5 @@
 com\community\service\SOSEmergencyService.class
+com\community\util\PasswordEncoder.class
 com\community\entity\Activity.class
 com\community\entity\Request.class
 com\community\controller\ActivityController.class
@@ -30,6 +31,7 @@ com\community\config\MybatisPlusConfig.class
 com\community\mapper\RequestMapper.class
 com\community\controller\RequestController.class
 com\community\service\UserService.class
+com\community\config\PasswordConfig.class
 com\community\config\WebMvcConfig.class
 com\community\entity\Certificate.class
 com\community\mapper\ActivityMapper.class
