@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公益活动 - 社区志愿服务管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #134E5E 0%, #71B280 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 {
+            font-size: 20px;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .page-header {
+            margin-bottom: 30px;
+        }
+        .page-header h2 {
+            color: white;
+        }
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .activity-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .activity-card:hover {
+            transform: translateY(-5px);
+        }
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        .activity-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .status-0 { background: #ffc107; color: #333; }
+        .status-1 { background: #17a2b8; color: white; }
+        .status-2 { background: #28a745; color: white; }
+        .status-3 { background: #6c757d; color: white; }
+        .activity-info {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .activity-info i {
+            margin-right: 5px;
+        }
+        .activity-description {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .activity-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .points-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+        .my-activities-link {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .my-activities-link a {
+            color: white;
+            text-decoration: none;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>社区志愿服务管理系统</h1>
+        <div class="nav-links">
+            <a href="/home">首页</a>
+            <a href="/volunteer/request">需求大厅</a>
+            <a href="/volunteer/sos">紧急求助</a>
+            <a href="/activity/list">公益活动</a>
+            <a href="/reward/list">积分商城</a>
+            <a href="/ai/assistant">AI助手</a>
+            <a href="/profile">个人中心</a>
+            <a href="/logout">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h2>公益活动</h2>
+        </div>
+
+        <div class="my-activities-link">
+            <a href="/activity/my">我的活动</a>
+        </div>
+
+        <div class="activities-grid" th:if="${not #lists.isEmpty(activities)}">
+            <div class="activity-card" th:each="activity : ${activities}">
+                <div class="activity-header">
+                    <div class="activity-title" th:text="${activity.title}"></div>
+                    <span class="status-badge" th:classappend="'status-' + ${activity.status}"
+                          th:text="${activity.status == 0 ? '未开始' : (activity.status == 1 ? '报名中' : (activity.status == 2 ? '进行中' : (activity.status == 3 ? '已结束' : '已取消')))}">
+                    </span>
+                </div>
+                <div class="activity-info">
+                    <div>地点：<span th:text="${activity.location}"></span></div>
+                    <div>时间：<span th:text="${activity.activityTime != null ? #temporals.format(activity.activityTime, 'yyyy-MM-dd HH:mm') : '未设置'}"></span></div>
+                    <div>人数：<span th:text="${activity.currentParticipants + '/' + (activity.maxParticipants > 0 ? activity.maxParticipants : '不限')}"></span></div>
+                    <div th:if="${activity.hours > 0}">时长：<span th:text="${activity.hours + '小时'}"></span></div>
+                </div>
+                <div class="activity-description" th:text="${activity.description != null ? activity.description : '暂无描述'}"></div>
+                <div class="activity-meta">
+                    <span class="points-badge" th:text="'+' + ${activity.points} + '积分'"></span>
+                    <a th:href="@{/activity/detail/{id}(id=${activity.id})}" class="btn btn-primary">查看详情</a>
+                </div>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(activities)}" class="empty-state">
+            <h3>暂无公益活动</h3>
+            <p>请稍后再来查看</p>
+        </div>
+    </div>
+</body>
+</html>

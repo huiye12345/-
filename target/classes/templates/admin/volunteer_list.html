@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>志愿者管理 - 社区志愿服务管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover {
+            color: #667eea;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .status-0 { background: #ffc107; color: #333; }
+        .status-1 { background: #28a745; color: white; }
+        .status-2 { background: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">社区志愿服务管理系统</div>
+        <div class="nav-links">
+            <a href="/home">首页</a>
+            <a href="/admin/dashboard">数据统计</a>
+            <a href="/admin/user/pending">用户审核</a>
+            <a href="/admin/volunteer/list">志愿者管理</a>
+            <a href="/admin/special/list">特殊人群管理</a>
+            <a href="/activity/admin/list">公益活动</a>
+            <a href="/reward/admin/list">积分商城</a>
+            <a href="/admin/sos">紧急求助</a>
+            <a href="/admin/create">👑 创建管理员</a>
+            <a href="/profile">个人中心</a>
+            <a href="/logout">退出</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h1>志愿者管理</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>姓名</th>
+                        <th>电话</th>
+                        <th>服务时长</th>
+                        <th>积分</th>
+                        <th>等级</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${page.records}">
+                        <td th:text="${user.id}"></td>
+                        <td th:text="${user.username}"></td>
+                        <td th:text="${user.realName}"></td>
+                        <td th:text="${user.phone}"></td>
+                        <td th:text="${user.volunteerHours} + '小时'"></td>
+                        <td th:text="${user.points}"></td>
+                        <td th:text="${user.level}"></td>
+                        <td>
+                            <span class="status-badge" th:classappend="'status-' + ${user.status}" 
+                                  th:text="${user.status == 0 ? '待审核' : (user.status == 1 ? '正常' : '禁用')}"></span>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary" th:if="${user.status == 0}" th:onclick="'approve(' + ${user.id} + ')'">通过</button>
+                            <button class="btn btn-danger" th:if="${user.status == 0}" th:onclick="'reject(' + ${user.id} + ')'">拒绝</button>
+                            <button class="btn btn-danger" th:if="${user.status == 1}" th:onclick="'disable(' + ${user.id} + ')'">禁用</button>
+                            <button class="btn btn-success" th:if="${user.status == 2}" th:onclick="'enable(' + ${user.id} + ')'">启用</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function approve(userId) {
+            fetch('/admin/user/approve?userId=' + userId, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+
+        function reject(userId) {
+            fetch('/admin/user/reject?userId=' + userId, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+
+        function disable(userId) {
+            if (confirm('确定要禁用该用户吗？')) {
+                fetch('/admin/user/disable?userId=' + userId, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            window.location.reload();
+                        } else {
+                            alert(data.message);
+                        }
+                    });
+            }
+        }
+
+        function enable(userId) {
+            if (confirm('确定要启用该用户吗？')) {
+                fetch('/admin/user/enable?userId=' + userId, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            window.location.reload();
+                        } else {
+                            alert(data.message);
+                        }
+                    });
+            }
+        }
+    </script>
+</body>
+</html>

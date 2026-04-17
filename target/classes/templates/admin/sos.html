@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOS紧急求助管理 - 社区志愿服务管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover {
+            color: #667eea;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .sos-card {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .sos-card.resolved {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        .sos-card.processing {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        }
+        .sos-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .sos-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .sos-time {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .sos-info {
+            margin: 10px 0;
+        }
+        .sos-info p {
+            margin: 5px 0;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        .btn-light {
+            background: white;
+            color: #333;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">社区志愿服务管理系统</div>
+        <div class="nav-links">
+            <a href="/home">首页</a>
+            <a href="/admin/dashboard">数据统计</a>
+            <a href="/admin/user/pending">用户审核</a>
+            <a href="/admin/volunteer/list">志愿者管理</a>
+            <a href="/admin/special/list">特殊人群管理</a>
+            <a href="/activity/admin/list">公益活动</a>
+            <a href="/reward/admin/list">积分商城</a>
+            <a href="/admin/sos">紧急求助</a>
+            <a href="/admin/create">👑 创建管理员</a>
+            <a href="/profile">个人中心</a>
+            <a href="/logout">退出</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h1>SOS紧急求助管理</h1>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('pending')">待处理</button>
+                <button class="tab" onclick="showTab('processing')">处理中</button>
+                <button class="tab" onclick="showTab('resolved')">已解决</button>
+            </div>
+
+            <div id="pending-list">
+                <div th:if="${#lists.isEmpty(pendingSOS)}" class="empty-state">
+                    <h3>暂无待处理的紧急求助</h3>
+                    <p>所有紧急求助都已得到响应</p>
+                </div>
+                <div th:each="sos : ${pendingSOS}" class="sos-card">
+                    <div class="sos-header">
+                        <span class="sos-title">紧急求助 #<span th:text="${sos.id}"></span></span>
+                        <span class="sos-time" th:text="${#temporals.format(sos.createTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </div>
+                    <div class="sos-info">
+                        <p><strong>求助人ID：</strong><span th:text="${sos.userId}"></span></p>
+                        <p><strong>位置：</strong><span th:text="${sos.location}"></span></p>
+                        <p><strong>描述：</strong><span th:text="${sos.description}"></span></p>
+                    </div>
+                    <button class="btn btn-light" th:onclick="'viewDetail(' + ${sos.id} + ')'">查看详情</button>
+                </div>
+            </div>
+
+            <div id="processing-list" style="display:none;">
+                <div th:if="${#lists.isEmpty(processingSOS)}" class="empty-state">
+                    <h3>暂无处理中的紧急求助</h3>
+                </div>
+                <div th:each="sos : ${processingSOS}" class="sos-card processing">
+                    <div class="sos-header">
+                        <span class="sos-title">紧急求助 #<span th:text="${sos.id}"></span></span>
+                        <span class="sos-time" th:text="${#temporals.format(sos.createTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </div>
+                    <div class="sos-info">
+                        <p><strong>求助人ID：</strong><span th:text="${sos.userId}"></span></p>
+                        <p><strong>位置：</strong><span th:text="${sos.location}"></span></p>
+                        <p><strong>响应志愿者ID：</strong><span th:text="${sos.responderId}"></span></p>
+                    </div>
+                    <button class="btn btn-light" th:onclick="'viewDetail(' + ${sos.id} + ')'">查看详情</button>
+                </div>
+            </div>
+
+            <div id="resolved-list" style="display:none;">
+                <div th:if="${#lists.isEmpty(resolvedSOS)}" class="empty-state">
+                    <h3>暂无已解决的紧急求助</h3>
+                </div>
+                <div th:each="sos : ${resolvedSOS}" class="sos-card resolved">
+                    <div class="sos-header">
+                        <span class="sos-title">紧急求助 #<span th:text="${sos.id}"></span></span>
+                        <span class="sos-time" th:text="${#temporals.format(sos.createTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </div>
+                    <div class="sos-info">
+                        <p><strong>求助人ID：</strong><span th:text="${sos.userId}"></span></p>
+                        <p><strong>位置：</strong><span th:text="${sos.location}"></span></p>
+                        <p><strong>响应志愿者ID：</strong><span th:text="${sos.responderId}"></span></p>
+                        <p><strong>解决时间：</strong><span th:text="${#temporals.format(sos.resolveTime, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+                    </div>
+                    <button class="btn btn-light" th:onclick="'viewDetail(' + ${sos.id} + ')'">查看详情</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('pending-list').style.display = 'none';
+            document.getElementById('processing-list').style.display = 'none';
+            document.getElementById('resolved-list').style.display = 'none';
+            
+            document.getElementById(tab + '-list').style.display = 'block';
+        }
+
+        function viewDetail(sosId) {
+            alert('SOS详情 ID: ' + sosId);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>紧急求助 - 社区志愿服务管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 {
+            font-size: 20px;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dc3545;
+        }
+        .sos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .sos-card {
+            background: #fff5f5;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #dc3545;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1);
+        }
+        .sos-card.urgent {
+            background: #ffe6e6;
+            border-left: 4px solid #ff0000;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.6); }
+        }
+        .sos-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .sos-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #dc3545;
+        }
+        .sos-time {
+            font-size: 12px;
+            color: #666;
+        }
+        .sos-info {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .sos-info p {
+            margin: 8px 0;
+        }
+        .sos-info strong {
+            color: #dc3545;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        .status-0 { background: #dc3545; color: white; }
+        .status-1 { background: #ffc107; color: #333; }
+        .status-2 { background: #28a745; color: white; }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>社区志愿服务管理系统</h1>
+        <div class="nav-links">
+            <a href="/home">首页</a>
+            <a href="/volunteer/request">接单服务</a>
+            <a href="/volunteer/sos">紧急求助</a>
+            <a href="/activity/list">公益活动</a>
+            <a href="/reward/list">积分商城</a>
+            <a href="/profile">个人中心</a>
+            <a href="/logout">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="alert-info">
+            <strong>提示：</strong>紧急求助是特殊人群发出的紧急服务请求，请尽快响应！
+        </div>
+
+        <div class="section">
+            <h2>待响应的紧急求助</h2>
+            <div class="sos-grid" th:if="${not #lists.isEmpty(pendingSOS)}">
+                <div class="sos-card urgent" th:each="sos : ${pendingSOS}">
+                    <div class="sos-header">
+                        <span class="sos-title">紧急求助</span>
+                        <span class="sos-time" th:text="${#temporals.format(sos.createTime, 'MM-dd HH:mm')}"></span>
+                    </div>
+                    <div class="sos-info">
+                        <p><strong>位置：</strong><span th:text="${sos.location}"></span></p>
+                        <p><strong>求助内容：</strong><span th:text="${sos.description}"></span></p>
+                    </div>
+                    <button class="btn btn-danger" th:onclick="'respondSOS(' + ${sos.id} + ')'">立即响应</button>
+                </div>
+            </div>
+            <div class="empty-state" th:if="${#lists.isEmpty(pendingSOS)}">
+                <p>暂无待响应的紧急求助</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>我已响应的求助</h2>
+            <div class="sos-grid" th:if="${not #lists.isEmpty(mySOS)}">
+                <div class="sos-card" th:each="sos : ${mySOS}">
+                    <div class="sos-header">
+                        <span class="sos-title">紧急求助</span>
+                        <span class="status-badge" th:classappend="'status-' + ${sos.status}"
+                              th:text="${sos.status == 1 ? '响应中' : '已完成'}"></span>
+                    </div>
+                    <div class="sos-info">
+                        <p><strong>位置：</strong><span th:text="${sos.location}"></span></p>
+                        <p><strong>求助内容：</strong><span th:text="${sos.description}"></span></p>
+                    </div>
+                    <button class="btn btn-success" th:if="${sos.status == 1}" th:onclick="'completeSOS(' + ${sos.id} + ')'">完成救援</button>
+                </div>
+            </div>
+            <div class="empty-state" th:if="${#lists.isEmpty(mySOS)}">
+                <p>您还没有响应过紧急求助</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function respondSOS(sosId) {
+            if (confirm('确定要响应这个紧急求助吗？')) {
+                fetch('/volunteer/sos/respond?emergencyId=' + sosId, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+
+        function completeSOS(sosId) {
+            if (confirm('确定已完成救援吗？')) {
+                fetch('/volunteer/sos/complete?emergencyId=' + sosId, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

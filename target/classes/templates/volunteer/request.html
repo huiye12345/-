@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接单服务 - 社区志愿服务管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 {
+            font-size: 20px;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        .request-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .request-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+        }
+        .request-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .request-info {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .request-info p {
+            margin: 5px 0;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .status-0 { background: #ffc107; color: #333; }
+        .status-1 { background: #17a2b8; color: white; }
+        .status-2 { background: #007bff; color: white; }
+        .status-3 { background: #28a745; color: white; }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>社区志愿服务管理系统</h1>
+        <div class="nav-links">
+            <a href="/home">首页</a>
+            <a href="/volunteer/request">接单服务</a>
+            <a href="/volunteer/sos">紧急求助</a>
+            <a href="/activity/list">公益活动</a>
+            <a href="/reward/list">积分商城</a>
+            <a href="/profile">个人中心</a>
+            <a href="/logout">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="section">
+            <h2>待接单需求</h2>
+            <div class="request-grid" th:if="${not #lists.isEmpty(pendingRequests)}">
+                <div class="request-card" th:each="request : ${pendingRequests}">
+                    <h3 th:text="${request.title}"></h3>
+                    <div class="request-info">
+                        <p><strong>服务类型：</strong><span th:text="${request.serviceType}"></span></p>
+                        <p><strong>服务时间：</strong><span th:text="${#temporals.format(request.serviceTime, 'yyyy-MM-dd HH:mm')}"></span></p>
+                        <p><strong>服务地址：</strong><span th:text="${request.address}"></span></p>
+                        <p><strong>需求详情：</strong><span th:text="${request.content}"></span></p>
+                    </div>
+                    <button class="btn btn-primary" th:onclick="'acceptRequest(' + ${request.id} + ')'">立即接单</button>
+                </div>
+            </div>
+            <div class="empty-state" th:if="${#lists.isEmpty(pendingRequests)}">
+                <p>暂无可接单的需求</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>我的接单</h2>
+            <div class="request-grid" th:if="${not #lists.isEmpty(myRequests)}">
+                <div class="request-card" th:each="request : ${myRequests}">
+                    <h3 th:text="${request.title}"></h3>
+                    <span class="status-badge" th:classappend="'status-' + ${request.status}"
+                          th:text="${request.status == 1 ? '已接单' : (request.status == 2 ? '服务中' : '已完成')}"></span>
+                    <div class="request-info">
+                        <p><strong>服务类型：</strong><span th:text="${request.serviceType}"></span></p>
+                        <p><strong>服务时间：</strong><span th:text="${#temporals.format(request.serviceTime, 'yyyy-MM-dd HH:mm')}"></span></p>
+                        <p><strong>服务地址：</strong><span th:text="${request.address}"></span></p>
+                    </div>
+                    <button class="btn btn-success" th:if="${request.status == 1}" th:onclick="'startService(' + ${request.id} + ')'">开始服务</button>
+                    <button class="btn btn-info" th:if="${request.status == 2}" th:onclick="'completeRequest(' + ${request.id} + ')'">完成服务</button>
+                </div>
+            </div>
+            <div class="empty-state" th:if="${#lists.isEmpty(myRequests)}">
+                <p>您还没有接单，快去接单吧</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function acceptRequest(requestId) {
+            if (confirm('确定要接这个订单吗？')) {
+                fetch('/volunteer/request/accept?requestId=' + requestId, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+
+        function startService(requestId) {
+            if (confirm('确定要开始服务吗？')) {
+                fetch('/volunteer/request/start?requestId=' + requestId, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+
+        function completeRequest(requestId) {
+            if (confirm('确定要完成服务吗？完成后将获得积分和时长奖励')) {
+                fetch('/volunteer/request/complete?requestId=' + requestId, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑奖励 - 社区志愿服务管理系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: white; }
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .page-title {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            width: 100%;
+        }
+        .btn-primary:hover { background: #5a67d8; }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+            margin-top: 1rem;
+        }
+        .btn-secondary:hover { background: #cbd5e0; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">社区志愿服务管理系统</div>
+        <div class="nav-links">
+            <a href="/home">首页</a>
+            <a href="/admin/dashboard">数据看板</a>
+            <a href="/admin/user/pending">用户审核</a>
+            <a href="/activity/admin/list">公益活动</a>
+            <a href="/reward/admin/list">积分商城</a>
+            <a href="/profile">个人中心</a>
+            <a href="/logout">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">编辑奖励</h1>
+
+        <div class="card">
+            <form id="rewardForm">
+                <input type="hidden" id="id" name="id" th:value="${reward.id}">
+                <div class="form-group">
+                    <label for="name">奖励名称</label>
+                    <input type="text" id="name" name="name" required placeholder="请输入奖励名称" th:value="${reward.name}">
+                </div>
+                <div class="form-group">
+                    <label for="description">奖励描述</label>
+                    <textarea id="description" name="description" rows="3" placeholder="请输入奖励描述" th:text="${reward.description}"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="type">奖励类型</label>
+                    <select id="type" name="type" required>
+                        <option value="实物" th:selected="${reward.type == '实物'}">实物</option>
+                        <option value="虚拟" th:selected="${reward.type == '虚拟'}">虚拟</option>
+                        <option value="优惠券" th:selected="${reward.type == '优惠券'}">优惠券</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="points">所需积分</label>
+                    <input type="number" id="points" name="points" required min="1" placeholder="请输入所需积分" th:value="${reward.points}">
+                </div>
+                <div class="form-group">
+                    <label for="stock">库存数量</label>
+                    <input type="number" id="stock" name="stock" required min="0" placeholder="请输入库存数量" th:value="${reward.stock}">
+                </div>
+                <button type="submit" class="btn btn-primary">保存修改</button>
+            </form>
+            <a href="/reward/admin/list" class="btn btn-secondary">返回列表</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('rewardForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: parseInt(document.getElementById('id').value),
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                type: document.getElementById('type').value,
+                points: parseInt(document.getElementById('points').value),
+                stock: parseInt(document.getElementById('stock').value)
+            };
+            
+            fetch('/reward/admin/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.href = '/reward/admin/list';
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                alert('更新失败，请重试');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>兑换管理 - 社区志愿服务管理系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: white; }
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .page-title {
+            color: white;
+            font-size: 1.8rem;
+        }
+        .filter-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .filter-tab.active {
+            background: #667eea;
+        }
+        .filter-tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            font-weight: 600;
+            color: #4a5568;
+            background: #f7fafc;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .status-0 { background: #fef3c7; color: #92400e; }
+        .status-1 { background: #c6f6d5; color: #22543d; }
+        .status-2 { background: #fed7d7; color: #742a2a; }
+        .points {
+            color: #ed8936;
+            font-weight: bold;
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        .btn-success:hover { background: #38a169; }
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        .btn-danger:hover { background: #e53e3e; }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            display: none;
+        }
+        .toast.success { background: #48bb78; }
+        .toast.error { background: #f56565; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">社区志愿服务管理系统</div>
+        <div class="nav-links">
+            <a href="/home">首页</a>
+            <a href="/admin/dashboard">数据看板</a>
+            <a href="/admin/user/pending">用户审核</a>
+            <a href="/activity/admin/list">公益活动</a>
+            <a href="/reward/admin/list">积分商城</a>
+            <a href="/reward/admin/exchanges">兑换管理</a>
+            <a href="/admin/sos">紧急求助</a>
+            <a href="/ai/assistant">AI助手</a>
+            <a href="/admin/create">👑 创建管理员</a>
+            <a href="/profile">个人中心</a>
+            <a href="/logout">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">兑换管理</h1>
+        </div>
+
+        <div class="filter-tabs">
+            <div class="filter-tab active" onclick="filterExchanges('all')">全部</div>
+            <div class="filter-tab" onclick="filterExchanges(0)">待处理</div>
+            <div class="filter-tab" onclick="filterExchanges(1)">已通过</div>
+            <div class="filter-tab" onclick="filterExchanges(2)">已拒绝</div>
+        </div>
+
+        <div class="card">
+            <table th:if="${not #lists.isEmpty(exchanges)}">
+                <thead>
+                    <tr>
+                        <th>兑换ID</th>
+                        <th>用户ID</th>
+                        <th>奖励名称</th>
+                        <th>消耗积分</th>
+                        <th>兑换时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="exchange : ${exchanges}" th:data-status="${exchange.status}">
+                        <td th:text="${exchange.id}">1</td>
+                        <td th:text="${exchange.userId}">100</td>
+                        <td th:text="${exchange.rewardName != null ? exchange.rewardName : '奖励已下架'}">测试1</td>
+                        <td class="points" th:text="${exchange.points} + ' 积分'">1 积分</td>
+                        <td th:text="${#temporals.format(exchange.createTime, 'yyyy-MM-dd HH:mm')}">2026-04-12 21:14</td>
+                        <td>
+                            <span class="status-badge" th:classappend="'status-' + ${exchange.status}"
+                                  th:text="${exchange.status == 0 ? '待处理' : (exchange.status == 1 ? '已通过' : '已拒绝')}">待处理</span>
+                        </td>
+                        <td>
+                            <button th:if="${exchange.status == 0}" 
+                                    class="btn btn-success" 
+                                    th:onclick="'processExchange(' + ${exchange.id} + ', 1)'">通过</button>
+                            <button th:if="${exchange.status == 0}" 
+                                    class="btn btn-danger" 
+                                    th:onclick="'processExchange(' + ${exchange.id} + ', 2)'">拒绝</button>
+                            <span th:if="${exchange.status != 0}">-</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div th:if="${#lists.isEmpty(exchanges)}" class="empty-state">
+                <p>暂无兑换记录</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        function processExchange(exchangeId, status) {
+            if (!confirm(status === 1 ? '确定要通过此兑换吗？' : '确定要拒绝此兑换吗？')) {
+                return;
+            }
+
+            fetch(`/reward/admin/exchange/process/${exchangeId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showToast('操作失败，请稍后重试', 'error');
+            });
+        }
+
+        function filterExchanges(status) {
+            const tabs = document.querySelectorAll('.filter-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                if (status === 'all') {
+                    row.style.display = '';
+                } else {
+                    const rowStatus = parseInt(row.getAttribute('data-status'));
+                    row.style.display = rowStatus === status ? '' : 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

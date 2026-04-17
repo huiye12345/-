@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分商城 - 社区志愿服务管理系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: white; }
+        .points-display {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .page-title {
+            color: white;
+            font-size: 1.8rem;
+        }
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .reward-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+        .reward-card:hover {
+            transform: translateY(-5px);
+        }
+        .reward-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+        .reward-type {
+            display: inline-block;
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        .reward-description {
+            color: #718096;
+            margin-bottom: 1rem;
+            min-height: 3rem;
+        }
+        .reward-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .reward-points {
+            color: #ed8936;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+        .reward-stock {
+            color: #4299e1;
+            font-size: 0.875rem;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover { background: #5a67d8; }
+        .btn-primary:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        .btn-secondary:hover { background: #cbd5e0; }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">社区志愿服务管理系统</div>
+        <div class="nav-links">
+            <a href="/home">首页</a>
+            <a href="/volunteer/request">接单服务</a>
+            <a href="/volunteer/sos">紧急求助</a>
+            <a href="/activity/list">公益活动</a>
+            <a href="/reward/list">积分商城</a>
+            <a href="/reward/my">我的兑换</a>
+            <a href="/ai/assistant">AI助手</a>
+            <a href="/profile">个人中心</a>
+            <a href="/logout">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">积分商城</h1>
+            <span class="points-display">我的积分: <span th:text="${user.points}">0</span></span>
+        </div>
+
+        <div class="rewards-grid" th:if="${not #lists.isEmpty(rewards)}">
+            <div class="reward-card" th:each="reward : ${rewards}">
+                <div class="reward-name" th:text="${reward.name}">奖励名称</div>
+                <span class="reward-type" th:text="${reward.type}">类型</span>
+                <div class="reward-description" th:text="${reward.description != null ? reward.description : '暂无描述'}">描述</div>
+                <div class="reward-footer">
+                    <div>
+                        <div class="reward-points" th:text="${reward.points} + ' 积分'">100 积分</div>
+                        <div class="reward-stock" th:text="'库存: ' + ${reward.stock}">库存: 10</div>
+                    </div>
+                    <button class="btn btn-primary" 
+                            th:onclick="'exchangeReward(' + ${reward.id} + ', ' + ${reward.points} + ')'"
+                            th:disabled="${reward.stock <= 0 || user.points < reward.points}"
+                            th:text="${reward.stock <= 0 ? '已售罄' : (user.points < reward.points ? '积分不足' : '立即兑换')}">
+                        立即兑换
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(rewards)}" class="empty-state">
+            <h3>暂无奖励商品</h3>
+            <p>敬请期待更多奖励上架</p>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        var userPoints = [[${user.points}]];
+        
+        function exchangeReward(rewardId, points) {
+            if (userPoints < points) {
+                alert('积分不足，需要 ' + points + ' 积分');
+                return;
+            }
+            
+            if (confirm('确定要兑换该奖励吗？将扣除 ' + points + ' 积分')) {
+                fetch('/reward/exchange/' + rewardId, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            window.location.reload();
+                        } else {
+                            alert(data.message);
+                        }
+                    });
+            }
+        }
+    </script>
+</body>
+</html>

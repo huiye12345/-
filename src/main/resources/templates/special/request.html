@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的需求 - 社区志愿服务管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 {
+            font-size: 20px;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .page-header h2 {
+            color: #333;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .request-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .request-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .request-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        .status-0 { background: #ffc107; color: #333; }
+        .status-1 { background: #17a2b8; color: white; }
+        .status-2 { background: #007bff; color: white; }
+        .status-3 { background: #28a745; color: white; }
+        .status-4 { background: #dc3545; color: white; }
+        .request-info {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .request-info p {
+            margin: 5px 0;
+        }
+        .request-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>社区志愿服务管理系统</h1>
+        <div class="nav-links">
+            <a href="/home">首页</a>
+            <a href="/special/request">我的需求</a>
+            <a href="/special/sos">紧急求助</a>
+            <a href="/profile">个人中心</a>
+            <a href="/logout">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h2>我的需求</h2>
+            <a href="/special/request/create" class="btn btn-primary">发布新需求</a>
+        </div>
+
+        <div class="request-grid" th:if="${not #lists.isEmpty(requests)}">
+            <div class="request-card" th:each="request : ${requests}">
+                <div class="request-header">
+                    <span class="request-title" th:text="${request.title}"></span>
+                    <span class="status-badge" th:classappend="'status-' + ${request.status}"
+                          th:text="${request.status == 0 ? '待接单' : (request.status == 1 ? '已接单' : (request.status == 2 ? '服务中' : (request.status == 3 ? '已完成' : '已取消')))}"></span>
+                </div>
+                <div class="request-info">
+                    <p><strong>服务类型：</strong><span th:text="${request.serviceType}"></span></p>
+                    <p><strong>服务时间：</strong><span th:text="${#temporals.format(request.serviceTime, 'yyyy-MM-dd HH:mm')}"></span></p>
+                    <p><strong>服务地址：</strong><span th:text="${request.address}"></span></p>
+                    <p><strong>需求详情：</strong><span th:text="${request.content}"></span></p>
+                </div>
+                <div class="request-actions" th:if="${request.status == 0}">
+                    <button class="btn btn-danger btn-sm" th:onclick="'cancelRequest(' + ${request.id} + ')'">取消需求</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="empty-state" th:if="${#lists.isEmpty(requests)}">
+            <h3>暂无需求</h3>
+            <p>您还没有发布过服务需求，点击"发布新需求"按钮开始吧</p>
+        </div>
+    </div>
+
+    <script>
+        function cancelRequest(requestId) {
+            if (confirm('确定要取消这个需求吗？')) {
+                fetch('/special/request/cancel?requestId=' + requestId, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
