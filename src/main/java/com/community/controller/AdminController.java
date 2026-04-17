@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.community.annotation.OperationLog;
 import com.community.entity.User;
 import com.community.enums.RequestStatus;
 import com.community.enums.UserType;
 import com.community.service.RequestService;
 import com.community.service.UserService;
+import com.community.util.LogUtil;
 
 @Controller
 public class AdminController {
@@ -80,6 +82,7 @@ public class AdminController {
     
     @PostMapping("/admin/user/approve")
     @ResponseBody
+    @OperationLog(value = "审核通过用户", type = "UPDATE")
     public Map<String, Object> approveUser(@RequestParam Long userId, HttpSession session) {
         Map<String, Object> result = new HashMap<>();
         if (!checkAdmin(session)) {
@@ -88,7 +91,11 @@ public class AdminController {
             return result;
         }
         try {
+            User user = userService.getUserById(userId);
             userService.approveUser(userId);
+            // 记录操作日志
+            User admin = (User) session.getAttribute("user");
+            LogUtil.logOperation("审核通过用户", "UPDATE", admin.getUsername(), "用户ID:" + userId + ", 用户名:" + (user != null ? user.getUsername() : "未知"));
             result.put("success", true);
             result.put("message", "审核通过");
         } catch (Exception e) {

@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.community.annotation.OperationLog;
 import com.community.entity.User;
 import com.community.enums.UserType;
 import com.community.service.UserService;
+import com.community.util.LogUtil;
 
 @Controller
 public class UserController {
@@ -43,6 +45,7 @@ public class UserController {
     
     @PostMapping("/login")
     @ResponseBody
+    @OperationLog(value = "用户登录", type = "LOGIN")
     public Map<String, Object> login(@RequestParam String username, 
                                       @RequestParam String password,
                                       HttpSession session) {
@@ -50,9 +53,13 @@ public class UserController {
         try {
             User user = userService.login(username, password);
             session.setAttribute("user", user);
+            // 记录登录成功日志
+            LogUtil.logLogin(username, true, "登录成功，用户类型:" + user.getUserType());
             result.put("success", true);
             result.put("userType", user.getUserType());
         } catch (Exception e) {
+            // 记录登录失败日志
+            LogUtil.logLogin(username, false, e.getMessage());
             result.put("success", false);
             result.put("message", e.getMessage());
         }
@@ -66,13 +73,18 @@ public class UserController {
     
     @PostMapping("/register")
     @ResponseBody
+    @OperationLog(value = "用户注册", type = "CREATE")
     public Map<String, Object> register(User user) {
         Map<String, Object> result = new HashMap<>();
         try {
             userService.register(user);
+            // 记录注册日志
+            LogUtil.logOperation("用户注册", "CREATE", user.getUsername(), "注册成功，用户类型:" + user.getUserType());
             result.put("success", true);
             result.put("message", "注册成功，请等待审核");
         } catch (Exception e) {
+            // 记录注册失败日志
+            LogUtil.logOperation("用户注册", "CREATE", user.getUsername(), "注册失败:" + e.getMessage());
             result.put("success", false);
             result.put("message", e.getMessage());
         }

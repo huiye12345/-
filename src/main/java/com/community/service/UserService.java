@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.community.entity.User;
 import com.community.enums.UserType;
 import com.community.mapper.UserMapper;
+import com.community.util.PasswordEncoder;
 
 @Service
 public class UserService {
@@ -29,6 +30,8 @@ public class UserService {
         user.setVolunteerHours(0);
         user.setPoints(0);
         user.setLevel(1);
+        // 启用密码加密：对新注册用户进行密码加密
+        user.setPassword(PasswordEncoder.encode(user.getPassword()));
         userMapper.insert(user);
         return user;
     }
@@ -38,7 +41,16 @@ public class UserService {
         if (user == null) {
             throw new RuntimeException("用户不存在");
         }
-        if (!user.getPassword().equals(password)) {
+        // 启用密码加密验证：兼容明文密码和加密密码
+        boolean passwordMatch;
+        if (PasswordEncoder.isEncoded(user.getPassword())) {
+            // 密码已加密，使用PasswordEncoder验证
+            passwordMatch = PasswordEncoder.matches(password, user.getPassword());
+        } else {
+            // 密码未加密（旧数据），使用明文比较
+            passwordMatch = user.getPassword().equals(password);
+        }
+        if (!passwordMatch) {
             throw new RuntimeException("密码错误");
         }
         if (user.getStatus() == 0) {
