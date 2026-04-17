@@ -5,6 +5,7 @@ com\community\entity\Request.class
 com\community\controller\ActivityController.class
 com\community\mapper\RewardExchangeMapper.class
 com\community\service\RequestService.class
+com\community\util\PageResult.class
 com\community\entity\ActivityRecord.class
 com\community\service\ActivityService.class
 com\community\service\RewardService.class
@@ -31,6 +32,7 @@ com\community\config\MybatisPlusConfig.class
 com\community\mapper\RequestMapper.class
 com\community\controller\RequestController.class
 com\community\service\UserService.class
+com\community\util\PageQuery.class
 com\community\config\PasswordConfig.class
 com\community\config\WebMvcConfig.class
 com\community\entity\Certificate.class

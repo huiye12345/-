@@ -2,11 +2,13 @@ C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\communit
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\enums\RequestStatus.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\entity\Request.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\mapper\RewardExchangeMapper.java
+C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\util\PageQuery.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\entity\PointsRecord.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\service\SOSEmergencyService.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\entity\Evaluation.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\interceptor\LoginInterceptor.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\config\WebMvcConfig.java
+C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\util\PageResult.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\CommunityVolunteerApplication.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\mapper\ActivityRecordMapper.java
 C:\Users\lnky\Desktop\项目\社区特殊人群志愿服务管理系统\community-volunteer-service\src\main\java\com\community\mapper\RewardMapper.java
