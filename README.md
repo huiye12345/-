@@ -197,15 +197,6 @@ git checkout enhancement-safe
 - `tb_points_record` - 积分记录表
 - `tb_sos_emergency` - SOS紧急求助表
 
----
-
-## 🛡️ 安全特性
-
-- ✅ 密码加密存储（BCrypt）
-- ✅ 登录状态校验
-- ✅ 角色权限控制
-- ✅ SQL注入防护（MyBatis参数绑定）
-- ✅ XSS防护（Thymeleaf自动转义）
 
 ---
 
@@ -245,35 +236,10 @@ git checkout enhancement-safe
 
 ---
 
-## 🤝 贡献指南
-
-欢迎提交Issue和Pull Request！
-
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 打开 Pull Request
-
----
-
-## 📄 许可证
-
-本项目采用 [MIT](LICENSE) 许可证。
-
----
 
 ## 👨‍💻 作者
 
 - **huiye12345** - [GitHub](https://github.com/huiye12345)
-
----
-
-## 🙏 致谢
-
-- Spring Boot 团队
-- MyBatis-Plus 团队
-- 所有开源贡献者
 
 ---
 
